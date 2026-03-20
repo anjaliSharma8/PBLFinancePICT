@@ -1,29 +1,27 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { FiUser, FiMail, FiLock, FiShield, FiClock } from "react-icons/fi";
+import { FiUser, FiMail, FiLock, FiShield, FiClock, FiArrowRight, FiArrowLeft } from "react-icons/fi";
+import { motion } from "framer-motion";
 import "./register.css"; 
 
 const Register = () => {
-  // 1. Set up state for our form fields
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   
   const navigate = useNavigate();
 
-  // 2. Handle the form submission
   const handleRegister = async (e) => {
     e.preventDefault();
-    setError(""); // Clear any previous errors
+    setError(""); 
+    setLoading(true);
 
     try {
-      // Make sure this URL matches your actual backend route setup!
       const response = await fetch("http://localhost:8080/api/auth/register", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
 
@@ -31,96 +29,176 @@ const Register = () => {
 
       if (response.ok) {
         alert("Registration successful! Please sign in.");
-        navigate("/login"); // Send them to the login page
+        navigate("/login"); 
       } else {
-        // Show the error message from the backend (e.g., "User already exists")
         setError(data.message || "Registration failed");
       }
     } catch (err) {
       console.error(err);
       setError("Cannot connect to server. Is your backend running?");
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } }
+  };
+  
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100 } }
+  };
+
+  const formVariants = {
+    hidden: { scale: 0.95, opacity: 0 },
+    visible: { scale: 1, opacity: 1, transition: { type: "spring", stiffness: 80, delay: 0.3 } }
+  };
+
   return (
-    <div className="register-container">
+    <div className="auth-wrapper">
+      <Link to="/" className="back-btn">
+        <FiArrowLeft /> Back to Home
+      </Link>
       
-      {/* LEFT SIDE (BRANDING) */}
-      <div className="register-left">
-        <Link to="/" className="auth-brand">
-          <span className="brand-icon">✦</span>
-          <h2>ExpenseAI</h2>
-        </Link>
+      {/* Background Animated Orbs */}
+      <div className="ambient-orb orb-1"></div>
+      <div className="ambient-orb orb-2"></div>
+      <div className="ambient-orb orb-3"></div>
+      
+      <div className="auth-container">
         
-        <div className="auth-content-wrapper">
-          <div className="sub-brand">
-            <span className="bank-icon">🏛️</span>
-            <h3>LoanPro</h3>
+        {/* LEFT SIDE (Branding) */}
+        <motion.div 
+          className="auth-left"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <motion.div variants={itemVariants}>
+            <Link to="/" className="auth-brand">
+              <span className="brand-logo">✦</span>
+              <h2>VaultCore</h2>
+            </Link>
+          </motion.div>
+
+          <div className="auth-content">
+            <motion.div variants={itemVariants} className="badge">
+              <span className="badge-icon">🏛️</span>
+              <span>Join the Future of Banking</span>
+            </motion.div>
+
+            <motion.h1 variants={itemVariants}>
+              Create your <br/>
+              <span className="text-gradient">Secure Account</span>
+            </motion.h1>
+            
+            <motion.p variants={itemVariants} className="auth-desc">
+              Join thousands of users scaling their financial success securely through VaultCore.
+            </motion.p>
+
+            <motion.div variants={containerVariants} className="auth-features">
+              <motion.div variants={itemVariants} className="feature-item">
+                <div className="feature-icon-wrapper"><FiShield /></div>
+                <span>Uncompromised Data Privacy</span>
+              </motion.div>
+              <motion.div variants={itemVariants} className="feature-item">
+                <div className="feature-icon-wrapper"><FiClock /></div>
+                <span>Less than 2 minutes to apply</span>
+              </motion.div>
+            </motion.div>
           </div>
-          
-          <h1>Create Your Account</h1>
-          <p>Join LoanPro and get instant access to secure loan services.</p>
-          
-          <div className="auth-features">
-            <div className="auth-feature"><FiShield className="feature-icon" /><span>Secure Authentication</span></div>
-            <div className="auth-feature"><FiClock className="feature-icon" /><span>Instant Loan Approval</span></div>
-            <div className="auth-feature"><FiLock className="feature-icon" /><span>Protected Data Privacy</span></div>
+        </motion.div>
+
+        {/* RIGHT SIDE (Form) */}
+        <motion.div 
+          className="auth-right"
+          variants={formVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <div className="glass-form-card">
+            <form className="auth-form" onSubmit={handleRegister}>
+              <div className="form-header">
+                <h2>Create Account</h2>
+                <p>Register to start your financial journey</p>
+              </div>
+
+              {error && (
+                <motion.div 
+                  className="error-message"
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  {error}
+                </motion.div>
+              )}
+
+              <div className="input-group">
+                <FiUser className="input-icon" />
+                <input
+                  type="text"
+                  placeholder="Full Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                />
+                <div className="input-highlight"></div>
+              </div>
+
+              <div className="input-group">
+                <FiMail className="input-icon" />
+                <input
+                  type="email"
+                  placeholder="Email Address"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+                <div className="input-highlight"></div>
+              </div>
+
+              <div className="input-group">
+                <FiLock className="input-icon" />
+                <input
+                  type="password"
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+                <div className="input-highlight"></div>
+              </div>
+
+              <div className="form-options">
+                <label className="checkbox-container">
+                  <input type="checkbox" required />
+                  <span className="checkmark"></span>
+                  I agree to the <a href="#" className="forgot-link">Terms & Conditions</a>
+                </label>
+              </div>
+
+              <motion.button 
+                type="submit" 
+                className="submit-btn" 
+                disabled={loading}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {loading ? "Creating Account..." : (
+                  <>Sign Up <FiArrowRight className="btn-icon" /></>
+                )}
+              </motion.button>
+
+              <p className="auth-footer-text">
+                Already have an account? <Link to="/login">Sign in here</Link>
+              </p>
+            </form>
           </div>
-        </div>
+        </motion.div>
       </div>
-
-      {/* RIGHT SIDE (FORM) */}
-      <div className="register-right">
-        {/* 3. Attach the submit handler to the form */}
-        <form className="register-form" onSubmit={handleRegister}>
-          <h2>Create an Account</h2>
-          
-          {/* Display errors if there are any */}
-          {error && <p style={{ color: "#ef4444", textAlign: "center", marginBottom: "15px" }}>{error}</p>}
-          
-          <div className="input-group">
-            <FiUser className="input-icon" />
-            <input 
-              type="text" 
-              placeholder="Full Name" 
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required 
-            />
-          </div>
-
-          <div className="input-group">
-            <FiMail className="input-icon" />
-            <input 
-              type="email" 
-              placeholder="Email Address" 
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required 
-            />
-          </div>
-
-          <div className="input-group">
-            <FiLock className="input-icon" />
-            <input 
-              type="password" 
-              placeholder="Password" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required 
-            />
-          </div>
-
-          <button type="submit" className="auth-btn">
-            Sign Up
-          </button>
-
-          <p className="bottom-text">
-            Already have an account? <Link to="/login">Sign in here</Link>
-          </p>
-        </form>
-      </div>
-
     </div>
   );
 };
