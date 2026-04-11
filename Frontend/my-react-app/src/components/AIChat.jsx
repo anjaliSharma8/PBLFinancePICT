@@ -1,22 +1,23 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, X, Send } from 'lucide-react';
+import { MessageSquare, X, Send, Paperclip } from 'lucide-react';
 import './dashboard.css';
 
 const AIChat = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'assistant', text: "Hi! I'm VaultCore AI. Ask me if you can afford that new purchase or how an expense affects your budget!" }
+    { role: 'assistant', text: "Hi! I'm VaultCore AI. Ask me about your budget, or upload a CSV or PDF of your recent statement for me to analyze!" }
   ]);
   const [input, setInput] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() && !selectedFile) return;
 
     const userMsg = input.trim();
-    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+    setMessages(prev => [...prev, { role: 'user', text: userMsg || "Please analyze my attached document and give me suggestions." }]);
     setInput('');
     setLoading(true);
 
@@ -27,11 +28,26 @@ const AIChat = () => {
         try { userId = JSON.parse(storedUser).id; } catch(e) {}
       }
 
-      const res = await fetch('http://127.0.0.1:5000/api/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMsg, userId })
-      });
+      let res;
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append('message', userMsg || "Please analyze this attached log and give me my spending summary and suggestions.");
+        formData.append('userId', userId);
+        formData.append('file', selectedFile);
+
+        res = await fetch('http://127.0.0.1:5000/api/chat', {
+          method: 'POST',
+          body: formData
+        });
+        setSelectedFile(null); // Clear file after send
+      } else {
+        res = await fetch('http://127.0.0.1:5000/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: userMsg, userId })
+        });
+      }
+      
       const data = await res.json();
       setMessages(prev => [...prev, { role: 'assistant', text: data.reply }]);
     } catch(err) {
@@ -62,12 +78,22 @@ const AIChat = () => {
                   {m.text}
                 </div>
               ))}
-              {loading && <div className="chat-bubble assistant typing">Analyzing database...</div>}
+              {loading && <div className="chat-bubble assistant typing">Analyzing data...</div>}
             </div>
 
+            {selectedFile && (
+              <div className="chat-file-preview">
+                <span className="file-name">📄 {selectedFile.name}</span>
+                <button type="button" onClick={() => setSelectedFile(null)} className="remove-file-btn"><X size={14}/></button>
+              </div>
+            )}
             <form onSubmit={handleSend} className="chat-input-area border-t">
-              <input type="text" value={input} onChange={(e)=>setInput(e.target.value)} placeholder="Will this purchase break my budget?" className="chat-input glass-input" disabled={loading} />
-              <button type="submit" className="chat-send ai-glow-btn" disabled={loading}><Send size={18}/></button>
+              <label htmlFor="csv-upload" className="chat-attach-btn" title="Upload Transactions CSV or PDF">
+                <Paperclip size={18} />
+              </label>
+              <input type="file" id="csv-upload" accept=".csv, .pdf" style={{ display: 'none' }} onChange={(e) => setSelectedFile(e.target.files[0])} />
+              <input type="text" value={input} onChange={(e)=>setInput(e.target.value)} placeholder="Attach document or type message..." className="chat-input glass-input" disabled={loading} />
+              <button type="submit" className="chat-send ai-glow-btn" disabled={loading || (!input.trim() && !selectedFile)}><Send size={18}/></button>
             </form>
           </motion.div>
         )}

@@ -560,9 +560,30 @@
 .chat-bubble.user { background: #6366f1; color: #fff; border-bottom-right-radius: 2px; align-self: flex-end; }
 .chat-bubble.typing { color: #a855f7; font-style: italic; font-size: 0.8rem; border: none; background: transparent; }
 
-.chat-input-area {
-  display: flex; gap: 0.5rem; padding: 1rem; border-top: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2);
+.chat-file-preview {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.5rem 0.75rem; background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3); margin: 0 1rem 0.5rem 1rem;
+  border-radius: 8px; font-size: 0.85rem;
 }
+.file-name {
+  color: #a5b4fc; font-weight: 500; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis; max-width: 200px;
+}
+.remove-file-btn {
+  background: transparent; border: none; color: #f43f5e; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; padding: 2px; border-radius: 4px;
+}
+.remove-file-btn:hover { background: rgba(244, 63, 94, 0.2); }
+
+.chat-input-area {
+  display: flex; gap: 0.5rem; padding: 1rem; border-top: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); align-items: center;
+}
+.chat-attach-btn {
+  display: flex; align-items: center; justify-content: center; width: 45px; height: 45px;
+  border-radius: 8px; background: rgba(255, 255, 255, 0.05); cursor: pointer; color: #94a3b8; transition: all 0.2s;
+}
+.chat-attach-btn:hover { background: rgba(99, 102, 241, 0.2); color: #cbd5e1; }
 .chat-input { flex: 1; min-height: 45px; }
 .chat-send { width: 45px; height: 45px; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 

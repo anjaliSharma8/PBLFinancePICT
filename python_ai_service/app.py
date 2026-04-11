@@ -82,9 +82,15 @@ def chat():
     if db is None:
         return jsonify({"reply": "Database connection missing."})
         
-    data = request.json
-    user_message = data.get('message', '')
-    user_id = data.get('userId', '')
+    if request.is_json:
+        data = request.json
+        user_message = data.get('message', '')
+        user_id = data.get('userId', '')
+        file = None
+    else:
+        user_message = request.form.get('message', '')
+        user_id = request.form.get('userId', '')
+        file = request.files.get('file')
     
     if not user_id or len(user_id) != 24:
         return jsonify({"reply": "User not authenticated. Please log in to use AI Chat."})
@@ -98,15 +104,67 @@ def chat():
     if budgets:
         income = budgets[0].get('income', 0)
         budget_context = f"User has a monthly planned budget of ₹{income}."
+
+    csv_context = ""
+    if file and file.filename.endswith('.csv'):
+        try:
+            df_curr = pd.read_csv(file)
+            df_curr.columns = [str(c).lower().strip() for c in df_curr.columns]
+            
+            amount_col = next((c for c in df_curr.columns if 'amount' in c or 'debit' in c or '₹' in c or 'spend' in c or 'withdrawal' in c), None)
+            desc_col = next((c for c in df_curr.columns if 'description' in c or 'detail' in c or 'remark' in c or 'category' in c or 'narrative' in c or 'particulars' in c), None)
+            date_col = next((c for c in df_curr.columns if 'date' in c or 'time' in c), None)
+            
+            if amount_col:
+                # Remove non-numeric characters except . and - and convert to float
+                df_curr['parsed_amount'] = pd.to_numeric(df_curr[amount_col].astype(str).str.replace(r'[^\d.-]', '', regex=True), errors='coerce').fillna(0)
+                # Keep positive values if there's no way to distinguish debit/credit or just sum all amounts
+                total_spent = df_curr['parsed_amount'].abs().sum() if df_curr['parsed_amount'].min() < 0 else df_curr['parsed_amount'].sum()
+                csv_context += f"\nUploaded CSV Analysis: The user uploaded a custom transaction log. The total amount recorded in the file is ₹{total_spent:,.2f}. "
+                
+                if date_col:
+                    df_curr[date_col] = pd.to_datetime(df_curr[date_col], errors='coerce')
+                    daily_spent = df_curr.groupby(df_curr[date_col].dt.date)['parsed_amount'].apply(lambda x: x.abs().sum())
+                    if not daily_spent.empty:
+                        max_day = daily_spent.idxmax()
+                        max_val = daily_spent.max()
+                        if pd.notnull(max_day):
+                            csv_context += f"Highest recorded daily spending was ₹{max_val:,.2f} on {max_day}. "
+                
+                if desc_col:
+                    top_descriptions = df_curr.groupby(desc_col)['parsed_amount'].apply(lambda x: x.abs().sum()).sort_values(ascending=False).head(3)
+                    top_desc_str = ", ".join([f"'{k}' (₹{v:,.2f})" for k, v in top_descriptions.items()])
+                    csv_context += f"The top spending items/categories in this file are: {top_desc_str}. "
+        except Exception as e:
+            print(f"Error parsing CSV: {e}")
+            csv_context = "\n(The user tried to upload a CSV file but it could not be fully parsed or lacked standard 'amount'/'date' columns)."
+    elif file and file.filename.endswith('.pdf'):
+        try:
+            import pypdf
+            reader = pypdf.PdfReader(file)
+            pdf_text = ""
+            for page in reader.pages:
+                text = page.extract_text()
+                if text:
+                    pdf_text += text + "\n"
+            
+            if len(pdf_text) > 50000:
+                pdf_text = pdf_text[:50000] + "\n...[Text Truncated]..."
+                
+            csv_context += f"\nUploaded PDF Analysis: The user uploaded a bank statement in PDF format. Raw extracted text:\n{pdf_text}\n(Please analyze the above raw text, which acts as a transaction log, to answer the user's question regarding their spending, trends, and budget suggestions. Ignore visual layout artifacts and extract logical transactions.)."
+        except Exception as e:
+            print(f"Error parsing PDF: {e}")
+            csv_context = "\n(The user tried to upload a PDF file but there was an error extracting text from it)."
         
     system_prompt = f"""
     You are 'VaultCore AI', an expert financial assistant integrated into a high-end personal finance app.
     The user is asking a proactive question about their finances (e.g., 'Should I buy this?').
     Context:
     {budget_context}
-    Recent user expenses: {tx_data}
-    Constraint: Provide a concise (max 3 sentences), highly analytical, and friendly answer. 
-    Use the expenses logic to justify if they can afford the item. 
+    Recent user database expenses: {tx_data}
+    {csv_context}
+    Constraint: Provide a concise (max 3-4 sentences), highly analytical, and friendly answer. 
+    Use the database expenses AND any Uploaded CSV Analysis (if present) to justify if they can afford an item or to provide suggestions on managing their money.
     """
     
     if GEMINI_API_KEY:
