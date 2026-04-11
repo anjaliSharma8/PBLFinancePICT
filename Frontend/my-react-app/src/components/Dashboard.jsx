@@ -10,11 +10,14 @@ import './dashboard.css';
 import Transactions from './Transactions';
 import MonthlySetup from './MonthlySetup';
 import AIChat from './AIChat';
+import LoanOffers from './LoanOffers';
 
 
 
 const Dashboard = () => {
+  const [creditScore, setCreditScore] = useState(600);
   const [activeView, setActiveView] = useState("overview");
+  const [loans, setLoans] = useState([]);
 
   // State for original functionality
   const [transactions, setTransactions] = useState([]);
@@ -40,6 +43,13 @@ const Dashboard = () => {
       fetchAlerts();
     }
   }, [activeView]);
+  
+   useEffect(() => {
+    fetch("http://localhost:8080/api/loan/offers")
+      .then(res => res.json())
+      .then(data => setLoans(data))
+      .catch(err => console.log(err));
+  }, []);
 
   const fetchBudget = async () => {
     try {
@@ -96,9 +106,33 @@ const Dashboard = () => {
   const income = budgetIncome; // Using Planned Budget Income as requested
 
   const expense = transactions
-    .filter(t => t.type === "expense")
-    .reduce((acc, curr) => acc + curr.amount, 0);
+  .filter(t => t.type === "expense")
+  .reduce((acc, curr) => acc + curr.amount, 0);
+    useEffect(() => {
+  if (income === 0) return;
 
+  let score = 600;
+
+  const savings = income - expense;
+  const savingsRatio = savings / income;
+
+  if (savingsRatio > 0.4) score += 100;
+  else if (savingsRatio > 0.2) score += 70;
+  else if (savingsRatio > 0.1) score += 40;
+  else score -= 20;
+
+  if (expense > income * 0.8) score -= 50;
+
+  if (income > 30000) score += 50;
+  if (income > 70000) score += 50;
+
+  score = Math.max(300, Math.min(850, score));
+
+  setCreditScore(Math.round(score));
+
+}, [income, expense])
+
+   
   const balance = budgetIncome - expense;
   const recentTransactions = transactions.slice(0, 5);
 
@@ -144,7 +178,9 @@ const Dashboard = () => {
     hidden: { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 80, damping: 15 } }
   };
-
+const topLoans = [...loans]
+  .sort((a, b) => a.interest - b.interest)
+  .slice(0, 2);
   return (
     <div className="dashboard-wrapper">
       {/* Background Animated Orbs */}
@@ -167,8 +203,15 @@ const Dashboard = () => {
             <a href="#" className={`nav-item ${activeView === 'overview' ? 'active' : ''}`} onClick={(e)=>{e.preventDefault(); setActiveView('overview');}}><LayoutDashboard size={20} /> Overview</a>
             <a href="#" className={`nav-item ${activeView === 'transactions' ? 'active' : ''}`} onClick={(e)=>{e.preventDefault(); setActiveView('transactions');}}><Wallet size={20} /> Transactions</a>
             <a href="#" className="nav-item"><TrendingUp size={20} /> Expense Trends</a>
-            <a href="#" className="nav-item"><CreditCard size={20} /> Loan Offers</a>
+           <a 
+          href="#" 
+            className={`nav-item ${activeView === 'loan' ? 'active' : ''}`} 
+               onClick={(e)=>{e.preventDefault(); setActiveView('loan');}}
+   >
+  <CreditCard size={20} /> Loan Offers
+</a>
             <a href="#" className={`nav-item ${activeView === 'budget' ? 'active' : ''}`} onClick={(e)=>{e.preventDefault(); setActiveView('budget');}}><PieChart size={20} /> Budget Setup</a>
+            
           </nav>
         </motion.aside>
 
@@ -312,6 +355,7 @@ const Dashboard = () => {
 
         {activeView === "transactions" && <Transactions />}
         {activeView === "budget" && <MonthlySetup />}
+        {activeView === "loan" && <LoanOffers />}
         
         </main>
 
@@ -322,58 +366,64 @@ const Dashboard = () => {
             <div className="credit-health glass-card">
               <h4>Credit Health</h4>
               <div className="score-ring">
-                <h2>750</h2>
-                <p>Excellent</p>
+                <h2>{creditScore}</h2>
+
+<p>
+  {creditScore >= 750 ? "Excellent" :
+   creditScore >= 700 ? "Good" :
+   creditScore >= 650 ? "Average" :
+   "Poor"}
+</p>
               </div>
               <p className="health-detail">Your stable income makes you highly eligible for top-tier loan rates.</p>
             </div>
 
             <h3 className="section-title">AI Loan Matches</h3>
             
-            <div className="loan-cards">
-              {/* LOAN 1 */}
-              <div className="loan-match-card">
-                <div className="loan-header">
-                  <div>
-                    <h4>HDFC Bank</h4>
-                    <p>Personal Loan</p>
-                  </div>
-                  <div className="loan-badge">Pre-approved</div>
-                </div>
-                <div className="loan-details">
-                  <div className="loan-stat">
-                    <span>Amount</span>
-                    <strong>Up to ₹5L</strong>
-                  </div>
-                  <div className="loan-stat">
-                    <span>Interest</span>
-                    <strong>10.5% p.a</strong>
-                  </div>
-                </div>
-                <button className="apply-btn">View Details</button>
-              </div>
+           
+             <div className="loan-cards">
+  {topLoans.length === 0 ? (
+    <p style={{ color: "#94a3b8" }}>Loading loans...</p>
+  ) : (
+    topLoans.map((loan, index) => (
+      <div key={index} className="loan-match-card">
+        
+        <div className="loan-header">
+          <div>
+            <h4>{loan.bank}</h4>
+            <p>{loan.type}</p>
+          </div>
 
-              {/* LOAN 2 */}
-              <div className="loan-match-card">
-                <div className="loan-header">
-                  <div>
-                    <h4>SBI Finance</h4>
-                    <p>Auto Loan</p>
-                  </div>
-                </div>
-                <div className="loan-details">
-                  <div className="loan-stat">
-                    <span>Amount</span>
-                    <strong>Up to ₹12L</strong>
-                  </div>
-                  <div className="loan-stat">
-                    <span>Interest</span>
-                    <strong>8.9% p.a</strong>
-                  </div>
-                </div>
-                <button className="apply-btn outline">Apply Now</button>
-              </div>
-            </div>
+          {/* SAME BADGE STYLE */}
+          {index === 0 && (
+            <div className="loan-badge">Pre-approved</div>
+          )}
+        </div>
+
+        <div className="loan-details">
+          <div className="loan-stat">
+            <span>Amount</span>
+            <strong>{loan.amount}</strong>
+          </div>
+          <div className="loan-stat">
+            <span>Interest</span>
+            <strong>{loan.interest}% p.a</strong>
+          </div>
+        </div>
+
+        <button
+          className={`apply-btn ${index === 1 ? "outline" : ""}`}
+          onClick={() => window.open(loan.link, "_blank")}
+        >
+          {index === 0 ? "View Details" : "Apply Now"}
+        </button>
+
+      </div>
+    ))
+  )}
+</div>
+             
+           
 
           </motion.aside>
         )}

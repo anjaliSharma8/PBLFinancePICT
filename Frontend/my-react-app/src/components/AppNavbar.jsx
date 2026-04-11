@@ -15,10 +15,18 @@ const AppNavbar = () => {
       <Link to="/" style={styles.brand}>
         <span style={styles.logo}>✦</span> VaultCore Dashboard
       </Link>
+
       <div style={styles.navLinks}>
         <Link to="/transactions" style={styles.link}>Transactions</Link>
+        
+        {/* ✅ NEW LINK ADDED */}
+        <Link to="/loan-offers" style={styles.link}>Loan Offers</Link>
+
         <Link to="/setup" style={styles.link}>Setup</Link>
-        <button onClick={handleLogout} style={styles.logoutBtn}>Logout</button>
+
+        <button onClick={handleLogout} style={styles.logoutBtn}>
+          Logout
+        </button>
       </div>
     </nav>
   );

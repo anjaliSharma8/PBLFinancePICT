@@ -1,41 +1,79 @@
-const OpenAI = require("openai");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
+//
+// --- BUDGET AI (Gemini) ---
+//
 async function getBudgetSuggestion(data) {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
 
-  const income = data?.income || 0;
-  const totalBudget = data?.totalBudget || 0;
-  const totalSpent = data?.totalSpent || 0;
-  const usagePercent = data?.usagePercent || 0;
-  const categoryBreakdown = data?.categoryBreakdown || "No Data";
-
-  const prompt = `
-User Monthly Income: ₹${income}
-Monthly Budget Limit: ₹${totalBudget}
-Current Spending: ₹${totalSpent}
-Budget Used: ${Number(usagePercent).toFixed(2)}%
+    const prompt = `
+User Monthly Income: ₹${data?.income || 0}
+Monthly Budget Limit: ₹${data?.totalBudget || 0}
+Current Spending: ₹${data?.totalSpent || 0}
+Budget Used: ${Number(data?.usagePercent || 0).toFixed(2)}%
 
 Spending By Category:
-${categoryBreakdown}
+${data?.categoryBreakdown || "No Data"}
 
 Give:
-1. Clear judgment (GOOD / MODERATE / OVERSPENDING)
+1. Judgment (GOOD / MODERATE / OVERSPENDING)
 2. Highest spending category
 3. Month-end prediction
-4. 2 short financial tips
+4. 2 tips
 
-Keep it short and practical.
+Keep it short.
 `;
 
-  const response = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [{ role: "user", content: prompt }],
-  });
+    const result = await model.generateContent(prompt);
+    return result.response.text();
 
-  return response.choices[0].message.content;
+  } catch (error) {
+    console.error("Budget AI Error:", error.message);
+    return "AI unavailable";
+  }
 }
 
-module.exports = getBudgetSuggestion;
+//
+// --- LOAN AI (Gemini) ---
+//
+async function generateLoanAnalysis(userProfile, loans) {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    const prompt = `
+You are a financial advisor.
+
+User:
+Credit Score: ${userProfile.creditScore}
+Loan Amount: ₹${userProfile.amount}
+Purpose: ${userProfile.purpose}
+
+Loans:
+${JSON.stringify(loans)}
+
+Return JSON:
+{
+  "topRecommendation": "...",
+  "fastestOption": "..."
+}
+`;
+
+    const result = await model.generateContent(prompt);
+    const text = result.response.text().replace(/```json|```/g, '');
+
+    return JSON.parse(text);
+
+  } catch (error) {
+    console.error("Loan AI Error:", error.message);
+
+    return {
+      topRecommendation: "AI unavailable",
+      fastestOption: "AI unavailable"
+    };
+  }
+}
+
+module.exports = { getBudgetSuggestion, generateLoanAnalysis };
