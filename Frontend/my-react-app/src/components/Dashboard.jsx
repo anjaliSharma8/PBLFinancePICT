@@ -45,7 +45,7 @@ const Dashboard = () => {
   }, [activeView]);
   
    useEffect(() => {
-    fetch("http://localhost:8080/api/loan/offers")
+    fetch("http://localhost:8080ers/api/loan/loan-suggestions")
       .then(res => res.json())
       .then(data => setLoans(data))
       .catch(err => console.log(err));

@@ -1,0 +1,143 @@
+[
+  {
+    "bank": "SBI",
+    "type": "personal",
+    "interestRate": 11.15,
+    "processingFee": 0,
+    "maxTenure": 60,
+    "minScore": 750,
+    "link": "https://sbi.co.in/web/personal-banking/loans/personal-loans"
+  },
+  {
+    "bank": "HDFC Bank",
+    "type": "personal",
+    "interestRate": 10.5,
+    "processingFee": 4999,
+    "maxTenure": 60,
+    "minScore": 720,
+    "link": "https://www.hdfcbank.com/personal/borrow/popular-loans/personal-loan"
+  },
+  {
+    "bank": "ICICI Bank",
+    "type": "personal",
+    "interestRate": 10.75,
+    "processingFee": 3500,
+    "maxTenure": 60,
+    "minScore": 700,
+    "link": "https://www.icicibank.com/personal-banking/loans/personal-loan"
+  },
+  {
+    "bank": "Axis Bank",
+    "type": "personal",
+    "interestRate": 11.25,
+    "processingFee": 4000,
+    "maxTenure": 60,
+    "minScore": 710,
+    "link": "https://www.axisbank.com/retail/loans/personal-loan"
+  },
+
+  {
+    "bank": "SBI",
+    "type": "home",
+    "interestRate": 8.6,
+    "processingFee": 3000,
+    "maxTenure": 240,
+    "minScore": 700,
+    "link": "https://sbi.co.in/web/personal-banking/home-loans"
+  },
+  {
+    "bank": "HDFC Bank",
+    "type": "home",
+    "interestRate": 8.5,
+    "processingFee": 3500,
+    "maxTenure": 240,
+    "minScore": 720,
+    "link": "https://www.hdfcbank.com/personal/borrow/home-loans"
+  },
+  {
+    "bank": "ICICI Bank",
+    "type": "home",
+    "interestRate": 8.7,
+    "processingFee": 3000,
+    "maxTenure": 240,
+    "minScore": 700,
+    "link": "https://www.icicibank.com/personal-banking/loans/home-loan"
+  },
+
+  {
+    "bank": "Axis Bank",
+    "type": "car",
+    "interestRate": 9.2,
+    "processingFee": 2500,
+    "maxTenure": 84,
+    "minScore": 700,
+    "link": "https://www.axisbank.com/retail/loans/car-loan"
+  },
+  {
+    "bank": "HDFC Bank",
+    "type": "car",
+    "interestRate": 9.0,
+    "processingFee": 3000,
+    "maxTenure": 84,
+    "minScore": 720,
+    "link": "https://www.hdfcbank.com/personal/borrow/car-loan"
+  },
+  {
+    "bank": "ICICI Bank",
+    "type": "car",
+    "interestRate": 9.3,
+    "processingFee": 2800,
+    "maxTenure": 84,
+    "minScore": 700,
+    "link": "https://www.icicibank.com/personal-banking/loans/car-loan"
+  },
+
+  {
+    "bank": "Bajaj Finance",
+    "type": "two-wheeler",
+    "interestRate": 12.5,
+    "processingFee": 1000,
+    "maxTenure": 48,
+    "minScore": 650,
+    "link": "https://www.bajajfinserv.in/two-wheeler-loan"
+  },
+  {
+    "bank": "TVS Credit",
+    "type": "two-wheeler",
+    "interestRate": 13.0,
+    "processingFee": 900,
+    "maxTenure": 48,
+    "minScore": 650,
+    "link": "https://www.tvscredit.com/two-wheeler-loans"
+  },
+
+  {
+    "bank": "Mahindra Finance",
+    "type": "used-car",
+    "interestRate": 13.0,
+    "processingFee": 1500,
+    "maxTenure": 60,
+    "minScore": 650,
+    "link": "https://www.mahindrafinance.com/used-car-loan"
+  },
+
+  {
+    "bank": "Axis Bank",
+    "type": "education",
+    "interestRate": 10.0,
+    "processingFee": 2000,
+    "maxTenure": 120,
+    "minScore": 680,
+    "link": "https://www.axisbank.com/retail/loans/education-loan"
+  },
+
+  {
+    "bank": "Muthoot Finance",
+    "type": "gold",
+    "interestRate": 11.5,
+    "processingFee": 500,
+    "maxTenure": 36,
+    "minScore": 600,
+    "link": "https://www.muthootfinance.com/gold-loan"
+  }
+]
