@@ -11,12 +11,19 @@ const AIChat = () => {
   const [input, setInput] = useState('');
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [suggestions] = useState([
+    "Compare available loans",
+    "Can I afford a ₹50k loan?",
+    "Show my top expenses",
+    "Budget optimization tips"
+  ]);
 
-  const handleSend = async (e) => {
-    e.preventDefault();
-    if (!input.trim() && !selectedFile) return;
+  const handleSend = async (e, directMsg = null) => {
+    if (e) e.preventDefault();
+    const finalMsg = directMsg || input;
+    if (!finalMsg.trim() && !selectedFile) return;
 
-    const userMsg = input.trim();
+    const userMsg = finalMsg.trim();
     setMessages(prev => [...prev, { role: 'user', text: userMsg || "Please analyze my attached document and give me suggestions." }]);
     setInput('');
     setLoading(true);
@@ -35,13 +42,13 @@ const AIChat = () => {
         formData.append('userId', userId);
         formData.append('file', selectedFile);
 
-        res = await fetch('http://127.0.0.1:5000/api/chat', {
+        res = await fetch('http://127.0.0.1:5001/api/chat', {
           method: 'POST',
           body: formData
         });
         setSelectedFile(null); // Clear file after send
       } else {
-        res = await fetch('http://127.0.0.1:5000/api/chat', {
+        res = await fetch('http://127.0.0.1:5001/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: userMsg, userId })
@@ -80,6 +87,25 @@ const AIChat = () => {
               ))}
               {loading && <div className="chat-bubble assistant typing">Analyzing data...</div>}
             </div>
+
+            {/* QUICK SUGGESTIONS */}
+            {!loading && messages.length <= 2 && (
+              <div style={{ padding: '0 16px 12px 16px', display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                {suggestions.map((s, idx) => (
+                  <motion.button
+                    key={idx}
+                    whileHover={{ scale: 1.05, background: 'rgba(99, 102, 241, 0.2)' }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      handleSend(null, s);
+                    }}
+                    style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#a5b4fc', padding: '6px 12px', borderRadius: '100px', fontSize: '0.75rem', cursor: 'pointer', fontWeight: '600' }}
+                  >
+                    {s}
+                  </motion.button>
+                ))}
+              </div>
+            )}
 
             {selectedFile && (
               <div className="chat-file-preview">

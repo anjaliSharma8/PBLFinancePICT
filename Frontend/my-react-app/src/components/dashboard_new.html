@@ -1,0 +1,197 @@
+< !DOCTYPE html><html class="light" lang="en"><head><meta charset="utf-8" /><meta content="width=device-width, initial-scale=1.0" name="viewport" /><title>VaultCore - Dashboard</title><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&amp;family=Work+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet" /><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" /><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" /><script id="tailwind-config">tailwind.config= {
+
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "primary": "#bc0100",
+          "primary-fixed": "#ffdad4",
+          "outline-variant": "#ebbbb4",
+          "on-secondary-fixed-variant": "#004299",
+          "overlay-black": "rgba(0,0,0,0.6)",
+          "success": "#2BA640",
+          "surface-container-highest": "#e4e2e2",
+          "on-tertiary-container": "#fefcff",
+          "error-container": "#ffdad6",
+          "tertiary-fixed": "#d7e2ff",
+          "tertiary": "#0059ba",
+          "primary-fixed-dim": "#ffb4a8",
+          "secondary-container": "#2a6fe5",
+          "on-secondary": "#ffffff",
+          "surface-container-lowest": "#ffffff",
+          "surface-container": "#efeded",
+          "primary-hover": "#CC0000",
+          "on-primary-fixed-variant": "#930100",
+          "on-tertiary": "#ffffff",
+          "on-secondary-fixed": "#001944",
+          "surface-tint": "#c00100",
+          "primary-container": "#eb0000",
+          "warning": "#FB8C00",
+          "tertiary-fixed-dim": "#acc7ff",
+          "inverse-primary": "#ffb4a8",
+          "on-surface": "#1b1c1c",
+          "text-secondary": "#606060",
+          "on-surface-variant": "#603e39",
+          "on-tertiary-fixed": "#001a40",
+          "on-primary-container": "#fffbff",
+          "on-primary-fixed": "#410000",
+          "secondary-fixed": "#d9e2ff",
+          "tertiary-container": "#0071e8",
+          "background": "#FFFFFF",
+          "error": "#FF0000",
+          "text-primary": "#0F0F0F",
+          "search-button-bg": "#F8F8F8",
+          "on-tertiary-fixed-variant": "#004491",
+          "surface-dim": "#dbdad9",
+          "surface-container-low": "#f5f3f3",
+          "outline": "#956d67",
+          "surface": "#F2F2F2",
+          "broadcast-red": "#FF0000",
+          "secondary-fixed-dim": "#afc6ff",
+          "on-secondary-container": "#fefcff",
+          "on-error": "#ffffff",
+          "on-error-container": "#93000a",
+          "inverse-surface": "#303031",
+          "secondary": "#0056c3",
+          "on-background": "#1b1c1c",
+          "surface-variant": "#e4e2e2",
+          "surface-bright": "#fbf9f8",
+          "inverse-on-surface": "#f2f0f0",
+          "link-blue": "#065FD4",
+          "border": "#E5E5E5",
+          "on-primary": "#ffffff",
+          "surface-container-high": "#e9e8e7"
+      }
+
+      ,
+      "borderRadius": {
+        "DEFAULT": "0.25rem",
+          "lg": "0.5rem",
+          "xl": "0.75rem",
+          "full": "9999px",
+          "card": "12px"
+      }
+
+      ,
+      "spacing": {
+        "4": "4px",
+          "12": "12px",
+          "16": "16px",
+          "base": "8px",
+          "header-height": "56px",
+          "sidebar-rail": "72px",
+          "64": "64px",
+          "8": "8px",
+          "24": "24px",
+          "grid-gap-x": "16px",
+          "sidebar-width": "240px",
+          "48": "48px",
+          "32": "32px",
+          "grid-gap-y": "40px"
+      }
+
+      ,
+      "fontFamily": {
+        "metadata": ["Work Sans"],
+          "video-title-grid": ["Work Sans"],
+          "channel-name": ["Work Sans"],
+          "label": ["Work Sans"],
+          "code": ["Roboto Mono"],
+          "page-title": ["Work Sans"],
+          "body": ["Work Sans"],
+          "body-small": ["Work Sans"],
+          "section-title": ["Work Sans"],
+          "video-title-watch": ["Work Sans"],
+          "button-text": ["Work Sans"]
+      }
+
+      ,
+      "fontSize": {
+
+        "metadata": ["12px",
+        {
+        "lineHeight": "16px", "fontWeight": "400"
+      }
+
+      ],
+      "video-title-grid": ["14px",
+      {
+      "lineHeight": "20px", "fontWeight": "500"
+    }
+
+    ],
+    "channel-name": ["14px",
+    {
+    "lineHeight": "20px", "fontWeight": "500"
+  }
+
+  ],
+  "label": ["12px",
+  {
+  "lineHeight": "16px", "letterSpacing": "0.02em", "fontWeight": "500"
+}
+
+],
+"code": ["14px",
+{
+"lineHeight": "20px", "fontWeight": "400"
+}
+
+],
+"page-title": ["24px",
+{
+"lineHeight": "32px", "fontWeight": "700"
+}
+
+],
+"body": ["14px",
+{
+"lineHeight": "20px", "fontWeight": "400"
+}
+
+],
+"body-small": ["12px",
+{
+"lineHeight": "18px", "fontWeight": "400"
+}
+
+],
+"section-title": ["20px",
+{
+"lineHeight": "28px", "fontWeight": "500"
+}
+
+],
+"video-title-watch": ["20px",
+{
+"lineHeight": "28px", "fontWeight": "700"
+}
+
+],
+"button-text": ["14px",
+{
+"lineHeight": "20px", "fontWeight": "500"
+}
+
+]
+}
+}
+}
+}
+
+</script><style>body {
+  font-family: 'Work Sans', sans-serif;
+}
+
+</style></head><body class="bg-background text-on-background antialiased h-screen overflow-hidden flex flex-col">< !-- TopNavBar --><nav class="bg-white dark:bg-neutral-950 font-['Work_Sans'] text-sm antialiased fixed top-0 w-full h-14 z-50 border-b border-neutral-200 dark:border-neutral-800 shadow-sm dark:shadow-none flex justify-between items-center px-4 max-w-[2200px] mx-auto"><div class="flex items-center gap-4"><span class="text-xl font-bold tracking-tight text-neutral-900 dark:text-white uppercase">VaultCore</span></div><div class="flex-1 flex justify-center max-w-2xl px-4"><div class="flex w-full items-center"><input class="w-full bg-search-button-bg border border-border rounded-l-full py-2 px-4 focus:outline-none focus:border-link-blue font-body text-body" placeholder="Search" type="text" /><button class="bg-search-button-bg border border-l-0 border-border rounded-r-full px-6 py-2 hover:bg-surface-container-highest transition-colors flex items-center justify-center"><span class="material-symbols-outlined text-text-secondary">search</span></button></div></div><div class="flex items-center gap-4 text-red-600 dark:text-red-500"><button class="hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors active:opacity-80 p-2 rounded-full flex items-center justify-center"><span class="material-symbols-outlined">notifications</span></button><button class="hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-colors active:opacity-80 p-2 rounded-full flex items-center justify-center"><span class="material-symbols-outlined">settings</span></button><div class="w-8 h-8 rounded-full bg-surface-container-highest overflow-hidden ml-2"><img alt="User profile" class="w-full h-full object-cover" data-alt="Close-up portrait of a young man with a slight smile, wearing a casual shirt, against a soft blurred background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_xONDH9CM33lk9VhHCPFA9xdAjiqlT6a7XHSebaapUbCbIzFIoQJfnnl2bxYGAf-UXv1Ps9ZRxXxVDBjs5JudcTZhLG4C4AbADTON99Tsgvq_8jwZIxc7uFwPHvs5nODmUuyhqdA8inVv1aJ31R3aYbqHRKzKbppKC13VT5od3gU0AsPx4ZT531tvWzi9q5oaEi_ciUaTv83Uc4b8FOlQ_ZwHVJpTmbWxoO077u3wuGTCUJz7QacXbHKDhnx8RaBVxqNxjCatVfU" /></div></div></nav><div class="flex flex-1 pt-14 h-full">< !-- SideNavBar --><aside class="bg-neutral-50 dark:bg-neutral-900 font-['Work_Sans'] font-medium text-sm fixed left-0 top-14 h-[calc(100vh-56px)] w-60 border-r border-r border-neutral-200 dark:border-neutral-800 flat no shadows flex flex-col gap-2 p-4 hidden md:flex z-40"><div class="mb-4 hidden"><h2 class="text-on-background font-bold text-lg">Finance</h2><p class="text-text-secondary text-xs">Personal Wealth</p></div><nav class="flex-1 flex flex-col gap-1"><a class="flex items-center gap-4 px-4 py-3 bg-neutral-200 dark:bg-neutral-800 text-neutral-900 dark:text-white font-bold border-r-4 border-red-600 duration-200 ease-in-out" href="#"><span class="material-symbols-outlined text-red-600 dark:text-red-500" data-weight="fill" style="font-variation-settings: 'FILL' 1;">dashboard</span><span>Dashboard</span></a><a class="flex items-center gap-4 px-4 py-3 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 duration-200 ease-in-out rounded-lg" href="#"><span class="material-symbols-outlined text-red-600 dark:text-red-500">account_balance_wallet</span><span>Budgets</span></a><a class="flex items-center gap-4 px-4 py-3 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 duration-200 ease-in-out rounded-lg" href="#"><span class="material-symbols-outlined text-red-600 dark:text-red-500">payments</span><span>Expenses</span></a><a class="flex items-center gap-4 px-4 py-3 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 duration-200 ease-in-out rounded-lg" href="#"><span class="material-symbols-outlined text-red-600 dark:text-red-500">compare_arrows</span><span>Cashflow</span></a><a class="flex items-center gap-4 px-4 py-3 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 duration-200 ease-in-out rounded-lg" href="#"><span class="material-symbols-outlined text-red-600 dark:text-red-500">analytics</span><span>Reports</span></a></nav><div class="mt-auto"><button class="w-full bg-primary text-on-primary py-2 px-4 rounded-full font-button-text text-button-text hover:bg-primary-hover transition-colors flex items-center justify-center gap-2"><span class="material-symbols-outlined text-[18px]">add</span>Add Transaction </button></div></aside>< !-- Main Content --><main class="flex-1 ml-0 md:ml-60 mr-0 lg:mr-80 overflow-y-auto bg-background p-6"><header class="mb-8 flex justify-between items-end"><div><h1 class="font-page-title text-page-title text-text-primary">Welcome back,
+Alex</h1><p class="font-body text-body text-text-secondary mt-1">Here is what's happening with your finances today.</p>
+ </div></header>< !-- KPI Row --><div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"><div class="bg-surface rounded-card p-6 flex flex-col justify-between border border-border"><div class="flex items-center justify-between mb-4"><span class="font-label text-label text-text-secondary uppercase tracking-wider">Current Balance</span><div class="w-8 h-8 rounded-full bg-tertiary-fixed flex items-center justify-center"><span class="material-symbols-outlined text-tertiary text-[16px]">account_balance</span></div></div><div><h2 class="text-3xl font-bold text-text-primary tracking-tight">$24,
+562.00</h2><div class="flex items-center gap-1 mt-2"><span class="material-symbols-outlined text-success text-[14px]">trending_up</span><span class="font-metadata text-metadata text-success">+2.4% from last month</span></div></div></div><div class="bg-surface rounded-card p-6 flex flex-col justify-between border border-border"><div class="flex items-center justify-between mb-4"><span class="font-label text-label text-text-secondary uppercase tracking-wider">Total Budget</span><div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center"><span class="material-symbols-outlined text-success text-[16px]">pie_chart</span></div></div><div><h2 class="text-3xl font-bold text-text-primary tracking-tight">$8,
+500.00</h2><div class="w-full bg-surface-container-highest rounded-full h-1.5 mt-3"><div class="bg-success h-1.5 rounded-full" style="width: 45%"></div></div><p class="font-metadata text-metadata text-text-secondary mt-2">45% utilized</p></div></div><div class="bg-surface rounded-card p-6 flex flex-col justify-between border border-border"><div class="flex items-center justify-between mb-4"><span class="font-label text-label text-text-secondary uppercase tracking-wider">Total Expense</span><div class="w-8 h-8 rounded-full bg-error-container flex items-center justify-center"><span class="material-symbols-outlined text-error text-[16px]">receipt_long</span></div></div><div><h2 class="text-3xl font-bold text-text-primary tracking-tight">$3,
+842.50</h2><div class="flex items-center gap-1 mt-2"><span class="material-symbols-outlined text-error text-[14px]">trending_down</span><span class="font-metadata text-metadata text-error">-1.2% from last month</span></div></div></div></div>< !-- Charts Grid --><div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">< !-- Area Chart Placeholder --><div class="lg:col-span-2 bg-surface rounded-card p-6 border border-border flex flex-col min-h-[300px]"><div class="flex justify-between items-center mb-6"><h3 class="font-section-title text-section-title text-text-primary">Income vs Expense Trends</h3><div class="flex items-center gap-2 text-text-secondary"><span class="font-label text-label bg-surface-container py-1 px-3 rounded-full cursor-pointer hover:bg-surface-variant transition-colors">This Month</span><span class="material-symbols-outlined text-[18px]">calendar_today</span></div></div><div class="flex-1 w-full bg-surface-container-lowest rounded-lg border border-border flex items-center justify-center text-text-secondary font-metadata">[Area Chart: Income (Green) vs Expense (Red)] </div></div>< !-- Donut Chart Placeholder --><div class="bg-surface rounded-card p-6 border border-border flex flex-col min-h-[300px]"><h3 class="font-section-title text-section-title text-text-primary mb-6">Spending Categories</h3><div class="flex-1 w-full flex items-center justify-center flex-col gap-4"><div class="w-32 h-32 rounded-full border-[12px] border-surface-container border-t-primary border-r-tertiary border-b-warning border-l-success"></div><ul class="w-full mt-4 space-y-2"><li class="flex justify-between items-center font-body-small text-body-small"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-primary"></span>Housing</div><span>35%</span></li><li class="flex justify-between items-center font-body-small text-body-small"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-tertiary"></span>Food</div><span>25%</span></li><li class="flex justify-between items-center font-body-small text-body-small"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-warning"></span>Transport</div><span>20%</span></li></ul></div></div></div>< !-- Recent Transactions --><div class="bg-surface rounded-card p-6 border border-border"><div class="flex justify-between items-center mb-6"><h3 class="font-section-title text-section-title text-text-primary">Recent Transactions</h3><button class="font-button-text text-button-text text-link-blue hover:underline">View All</button></div><div class="overflow-x-auto w-full"><table class="w-full text-left border-collapse"><thead><tr class="border-b border-border"><th class="py-3 px-4 font-label text-label text-text-secondary uppercase">Description</th><th class="py-3 px-4 font-label text-label text-text-secondary uppercase">Category</th><th class="py-3 px-4 font-label text-label text-text-secondary uppercase">Date</th><th class="py-3 px-4 font-label text-label text-text-secondary uppercase text-right">Amount</th></tr></thead><tbody><tr class="border-b border-surface-container-highest hover:bg-surface-container-lowest transition-colors"><td class="py-3 px-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center"><span class="material-symbols-outlined text-[16px]">shopping_cart</span></div><span class="font-body text-body text-text-primary">Whole Foods Market</span></div></td><td class="py-3 px-4 font-body-small text-body-small text-text-secondary">Groceries</td><td class="py-3 px-4 font-body-small text-body-small text-text-secondary">Oct 24,
+2023</td><td class="py-3 px-4 font-body text-body font-medium text-text-primary text-right">-$142.50</td></tr><tr class="border-b border-surface-container-highest hover:bg-surface-container-lowest transition-colors"><td class="py-3 px-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center"><span class="material-symbols-outlined text-[16px]">home</span></div><span class="font-body text-body text-text-primary">Monthly Rent</span></div></td><td class="py-3 px-4 font-body-small text-body-small text-text-secondary">Housing</td><td class="py-3 px-4 font-body-small text-body-small text-text-secondary">Oct 01,
+2023</td><td class="py-3 px-4 font-body text-body font-medium text-text-primary text-right">-$2,
+100.00</td></tr><tr class="hover:bg-surface-container-lowest transition-colors"><td class="py-3 px-4"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-tertiary-fixed flex items-center justify-center"><span class="material-symbols-outlined text-[16px] text-tertiary">work</span></div><span class="font-body text-body text-text-primary">Salary Deposit</span></div></td><td class="py-3 px-4 font-body-small text-body-small text-text-secondary">Income</td><td class="py-3 px-4 font-body-small text-body-small text-text-secondary">Sep 30,
+2023</td><td class="py-3 px-4 font-body text-body font-medium text-success text-right">+$4,
+250.00</td></tr></tbody></table></div></div><div class="h-24"></div>< !-- Bottom padding --></main>< !-- NavigationDrawer --><aside class="bg-white dark:bg-neutral-950 font-['Work_Sans'] text-xs uppercase tracking-wider fixed right-0 top-14 h-[calc(100vh-56px)] w-80 border-l border-l border-neutral-200 dark:border-neutral-800 flat no shadows flex flex-col p-6 space-y-8 hidden lg:flex z-30 overflow-y-auto"><div><h2 class="text-red-600 font-black text-lg tracking-normal">Intelligence</h2><p class="text-neutral-400 dark:text-neutral-500 normal-case">Credit &amp;
+Reports</p></div><nav class="flex flex-col gap-2"><a class="flex items-center gap-3 text-red-600 dark:text-red-400 font-bold hover:text-red-500 transition-colors ease-out duration-300" href="#"><span class="material-symbols-outlined">credit_score</span>Credit Health </a><a class="flex items-center gap-3 text-neutral-400 dark:text-neutral-500 hover:text-red-500 transition-colors ease-out duration-300" href="#"><span class="material-symbols-outlined">psychology</span>Intelligence Reports </a></nav><div class="bg-surface rounded-card p-5 border border-border mt-4"><h4 class="font-section-title text-[16px] leading-snug font-medium text-text-primary normal-case mb-4">Current Score</h4><div class="flex flex-col items-center justify-center py-4"><div class="relative w-32 h-32 flex items-center justify-center"><svg class="w-full h-full transform -rotate-90" viewbox="0 0 36 36"><path class="text-surface-container stroke-current" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-width="3"></path><path class="text-success stroke-current" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke-dasharray="85, 100" stroke-width="3"></path></svg><div class="absolute inset-0 flex flex-col items-center justify-center"><span class="text-3xl font-bold text-text-primary normal-case">750</span><span class="text-[10px] text-success font-medium">Excellent</span></div></div></div><button class="w-full mt-4 border border-border bg-surface-container-lowest text-text-primary py-2 rounded-full font-button-text text-button-text hover:bg-surface-container transition-colors normal-case">Update Credit Score</button></div><div class="bg-surface rounded-card p-5 border border-border"><h4 class="font-section-title text-[16px] leading-snug font-medium text-text-primary normal-case mb-4">Financial Intelligence Report</h4><div class="space-y-3 normal-case"><div><label class="block text-[10px] text-text-secondary uppercase mb-1">Start Date</label><input class="w-full bg-surface-container-lowest border border-border rounded px-3 py-1.5 text-sm focus:outline-none focus:border-link-blue" type="date" /></div><div><label class="block text-[10px] text-text-secondary uppercase mb-1">End Date</label><input class="w-full bg-surface-container-lowest border border-border rounded px-3 py-1.5 text-sm focus:outline-none focus:border-link-blue" type="date" /></div><button class="w-full mt-2 bg-[#0F0F0F] text-white py-2 rounded-full font-button-text text-button-text hover:bg-inverse-surface transition-colors">Generate Audit</button></div></div><div class="normal-case"><h4 class="font-label text-label text-text-secondary uppercase mb-3">Audit Summary Preview</h4><ul class="space-y-2"><li class="flex items-start gap-2"><span class="material-symbols-outlined text-[16px] text-warning mt-0.5">warning</span><span class="font-body-small text-body-small text-text-primary">Unusual spending detected in 'Dining Out' category this week.</span></li><li class="flex items-start gap-2"><span class="material-symbols-outlined text-[16px] text-success mt-0.5">check_circle</span><span class="font-body-small text-body-small text-text-primary">Savings goal 'Vacation 2024' is on track.</span></li></ul></div></aside></div></body></html>

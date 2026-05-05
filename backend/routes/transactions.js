@@ -39,6 +39,37 @@ router.post("/", verifyToken, async (req, res) => {
     });
 
     await newTransaction.save();
+    
+    // 🔥 REAL-TIME BUDGET ALERT CHECK
+    const io = req.app.get("io");
+    const allTxs = await Transaction.find({ 
+        userId: req.user.id, 
+        category: category, 
+        type: "expense",
+        date: { $gte: new Date(month + "-01") } 
+    });
+    const totalSpentInCat = allTxs.reduce((sum, t) => sum + t.amount, 0);
+
+    if (budget) {
+        // Find category with case-insensitive check
+        const catBudget = budget.expenses.find(e => e.category.toLowerCase() === category.toLowerCase());
+        
+        console.log(`Checking budget for [${category}]:`);
+        console.log(`- Total Spent this month: ₹${totalSpentInCat}`);
+        console.log(`- Budget Limit: ₹${catBudget ? catBudget.amount : "NOT SET"}`);
+
+        if (catBudget && totalSpentInCat > catBudget.amount) {
+            console.log("🚨 BUDGET ALERT TRIGGERED! Sending to socket room:", req.user.id);
+            io.to(req.user.id.toString()).emit("notification", {
+                title: "Budget Exceeded! ⚠️",
+                message: `You just spent ₹${amount} on ${category}. You've exceeded your ₹${catBudget.amount} budget for this category.`
+            });
+        } else {
+            console.log("ℹ️ No alert sent (Spent <= Budget or No Category Budget found)");
+        }
+    } else {
+        console.log("ℹ️ No budget found for this month in database.");
+    }
 
     res.status(201).json({
       message: "Transaction Added Successfully"

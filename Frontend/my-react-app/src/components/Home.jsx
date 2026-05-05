@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Wallet, TrendingUp, ShieldCheck, PieChart, Landmark } from 'lucide-react';
+import { Wallet, TrendingUp, ShieldCheck, PieChart } from 'lucide-react';
 
 export default function Homepage() {
   // --- SCROLL ANIMATION EFFECT ---
@@ -30,10 +30,10 @@ export default function Homepage() {
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700&display=swap');
 
     :root {
-      --primary-green: #6366f1; /* Changed to Fintech Indigo/Blue */
-      --primary-green-hover: #4f46e5;
+      --primary-green: #38bdf8; /* Vibrant Sky Blue */
+      --primary-green-hover: #0ea5e9;
       --text-light: #f8fafc;
-      --text-muted: #cbd5e1;
+      --text-muted: #94a3b8;
       
       /* Enhanced Glass variables */
       --glass-bg: rgba(15, 23, 42, 0.45);
@@ -120,12 +120,14 @@ export default function Homepage() {
       display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       font-weight: 700;
-      color: white;
       font-family: 'Playfair Display', serif;
       letter-spacing: 1px;
-      text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      background: linear-gradient(to right, #ffffff, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 4px 20px rgba(56, 189, 248, 0.3);
     }
     .nav-links {
       display: flex;
@@ -178,7 +180,7 @@ export default function Homepage() {
     .search-icon { position: absolute; left: 14px; color: rgba(255,255,255,0.6); width: 16px; height: 16px; z-index: 1; }
 
     .btn-glass {
-      background: var(--primary-green);
+      background: linear-gradient(135deg, #38bdf8 0%, #6366f1 100%);
       border: none;
       color: white;
       padding: 0.6rem 1.8rem;
@@ -188,7 +190,7 @@ export default function Homepage() {
       position: relative;
       overflow: hidden;
       transition: all 0.3s;
-      animation: pulse-glow 2.5s infinite;
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
     }
     .btn-glass::before {
       content: '';
@@ -198,7 +200,7 @@ export default function Homepage() {
       transform: skewX(-20deg);
       transition: all 0.6s ease;
     }
-    .btn-glass:hover { transform: translateY(-2px); background: var(--primary-green-hover); }
+    .btn-glass:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(99, 102, 241, 0.6), 0 0 20px rgba(56, 189, 248, 0.4); }
     .btn-glass:hover::before { left: 150%; }
 
     /* --- CENTERED IMMERSIVE HERO --- */
@@ -212,12 +214,12 @@ export default function Homepage() {
     .hero-title {
       font-family: 'Playfair Display', serif;
       font-size: clamp(3.5rem, 6vw, 6rem);
-      font-weight: 600;
+      font-weight: 700;
       line-height: 1.05;
       margin-bottom: 1.5rem;
       color: white;
       text-shadow: 0 10px 30px rgba(0,0,0,0.6);
-      background: linear-gradient(to bottom right, #ffffff, #d1d5db);
+      background: linear-gradient(to bottom right, #ffffff, #38bdf8, #818cf8);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
@@ -495,139 +497,109 @@ export default function Homepage() {
             VaultCore
           </div>
           <div className="nav-links">
-            <a href="#" className="nav-link active">Loans</a>
-            <a href="#" className="nav-link">Tracker</a>
-            <a href="#" className="nav-link">Analytics</a>
-            <a href="#" className="nav-link">Contact</a>
+            <a href="#" className="nav-link active">Home</a>
+            <a 
+              href="#about" 
+              className="nav-link" 
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('about').scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              About
+            </a>
+            <a 
+              href="#contact" 
+              className="nav-link" 
+              onClick={(e) => {
+                e.preventDefault();
+                document.getElementById('contact').scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              Contact
+            </a>
           </div>
-          <div className="search-bar-container">
-            <svg className="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-            <input type="text" className="search-bar" placeholder="Search loan options..." />
+          <div className="search-bar-container" style={{ justifyContent: 'flex-end' }}>
             <Link to="/login">
-              <button className="btn-glass">Sign In</button>
+              <button className="btn-glass">Get Started</button>
             </Link>
           </div>
         </nav>
 
         {/* --- HERO SECTION --- */}
         <div className="hero-section reveal-up delay-100">
-          <h1 className="hero-title">Master your budget,<br />fund your future.</h1>
+          <h1 className="hero-title">Financial Intelligence,<br />Simplified by AI.</h1>
           <p className="hero-desc">
-            An intelligent financial ecosystem. Bypass predatory lenders with AI-matched loan suggestions and track every expense with real-time analytics.
+            Experience a new era of personal finance. VaultCore uses advanced AI to analyze your spending, suggest budget optimizations, and protect you from predatory lending.
           </p>
         </div>
 
         {/* --- FLOATING STATS STRIP --- */}
         <div className="stats-strip reveal-scale delay-200">
           <div className="stat-item">
-            <div className="stat-num">50+</div>
-            <div className="stat-label">Lender Partners</div>
+            <div className="stat-num">98%</div>
+            <div className="stat-label">AI Accuracy</div>
           </div>
           <div className="stat-item">
-            <div className="stat-num">120k+</div>
-            <div className="stat-label">Active Users</div>
+            <div className="stat-num">₹0</div>
+            <div className="stat-label">Hidden Costs</div>
           </div>
           <div className="stat-item">
-            <div className="stat-num">24h</div>
-            <div className="stat-label">Fast Approvals</div>
+            <div className="stat-num">24/7</div>
+            <div className="stat-label">Smart Monitoring</div>
           </div>
           <div className="stat-item">
-            <div className="stat-num">0%</div>
-            <div className="stat-label">Hidden Fees</div>
+            <div className="stat-num">SEC</div>
+            <div className="stat-label">Instant Analysis</div>
           </div>
         </div>
 
-        {/* --- CORE FEATURES CARDS --- */}
-        <h2 className="section-title reveal-up">Core Capabilities</h2>
-
-        <div className="category-grid">
-          {/* Card 1 */}
-          <div className="cat-card reveal-up">
-            <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?q=80&w=800&auto=format&fit=crop" alt="Budget" className="cat-img" />
-            <div className="cat-overlay">
-              <h3 className="cat-title">Smart<br />Budgeting</h3>
-              <span className="cat-subtitle">Auto-categorize expenses and spot saving opportunities.</span>
-              <div className="cat-action">→</div>
-            </div>
-          </div>
-
-          {/* Card 2 */}
-          <div className="cat-card reveal-up delay-100">
-            <img src="https://images.unsplash.com/photo-1579621970588-a3f5ce599fac?q=80&w=800&auto=format&fit=crop" alt="Loans" className="cat-img" />
-            <div className="cat-overlay">
-              <h3 className="cat-title">Tailored<br />Loans</h3>
-              <span className="cat-subtitle">AI algorithms match you with the lowest interest rates.</span>
-              <div className="cat-action">→</div>
-            </div>
-          </div>
-
-          {/* Card 3 */}
-          <div className="cat-card reveal-up delay-200">
-            <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=800&auto=format&fit=crop" alt="Analytics" className="cat-img" />
-            <div className="cat-overlay">
-              <h3 className="cat-title">Deep<br />Analytics</h3>
-              <span className="cat-subtitle">Visualize your cash flow with interactive 3D charts.</span>
-              <div className="cat-action">→</div>
-            </div>
-          </div>
-
-          {/* Card 4 */}
-          <div className="cat-card reveal-up delay-300">
-            <img src="https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=800&auto=format&fit=crop" alt="Credit" className="cat-img" />
-            <div className="cat-overlay">
-              <h3 className="cat-title">Credit<br />Builder</h3>
-              <span className="cat-subtitle">Monitor your score and see how loans impact your health.</span>
-              <div className="cat-action">→</div>
-            </div>
-          </div>
-        </div>
-
-        {/* --- WHY CHOOSE US --- */}
-        <section className="why-section reveal-up">
-          <h2 className="section-title">Why VaultCore</h2>
-
-          <div className="why-grid">
-            <div className="why-card">
-              <TrendingUp className="why-icon" size={32} />
-              <h3>AI-Powered Matching</h3>
-              <p>No more guessing. Our algorithm analyzes your profile to suggest exact loan products you qualify for.</p>
-            </div>
-
-            <div className="why-card">
-              <PieChart className="why-icon" size={32} />
-              <h3>Real-Time Tracking</h3>
-              <p>Sync your accounts securely to monitor every penny with beautiful, actionable dashboards.</p>
-            </div>
-
-            <div className="why-card">
-              <ShieldCheck className="why-icon" size={32} />
-              <h3>Bank-Level Security</h3>
-              <p>Your data is encrypted with 256-bit AES security. We never sell your personal information.</p>
-            </div>
+        {/* --- ABOUT SECTION --- */}
+        <section id="about" className="reveal-up" style={{ margin: '8rem 0', scrollMarginTop: '100px' }}>
+          <h2 className="section-title">Our Mission</h2>
+          <div className="glass-card" style={{ 
+            padding: '4rem', 
+            borderRadius: '40px',
+            background: 'rgba(255,255,255,0.03)',
+            backdropFilter: 'blur(30px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            textAlign: 'center'
+          }}>
+            <h3 style={{ fontSize: '2.5rem', fontFamily: "'Playfair Display', serif", marginBottom: '1.5rem', color: 'white' }}>
+              We're Bridging the Gap Between <span style={{ color: 'var(--primary-green)' }}>Data and Wealth.</span>
+            </h3>
+            <p style={{ color: '#94a3b8', fontSize: '1.2rem', lineHeight: '1.8', maxWidth: '800px', margin: '0 auto' }}>
+              VaultCore was founded on a simple belief: personal finance shouldn't be complicated. By leveraging Google's Gemini AI, we transform complex bank statements and credit scores into actionable insights. We empower users to take control of their financial destiny without the need for an expensive advisor.
+            </p>
           </div>
         </section>
 
-        {/* --- SUCCESS STORIES --- */}
-        <section className="farmers-section reveal-up">
-          <h2 className="section-title">Success Stories</h2>
-
-          <div className="farmers-grid">
-            <div className="farmer-card">
-              <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=800&auto=format&fit=crop" alt="Sarah" />
-              <h4>Sarah Jenkins</h4>
-              <p>Saved $500/mo and fully funded her startup.</p>
+        {/* --- CONTACT SECTION (SIMPLIFIED) --- */}
+        <section id="contact" className="reveal-up" style={{ margin: '8rem 0', scrollMarginTop: '100px' }}>
+          <h2 className="section-title">Get In Touch</h2>
+          <div className="glass-card" style={{ 
+            display: 'flex', 
+            justifyContent: 'space-around',
+            flexWrap: 'wrap',
+            gap: '3rem', 
+            padding: '3rem', 
+            borderRadius: '40px',
+            background: 'rgba(255,255,255,0.03)',
+            backdropFilter: 'blur(30px)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            textAlign: 'center'
+          }}>
+            <div>
+              <h4 style={{ color: '#94a3b8', marginBottom: '0.5rem', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '2px' }}>Call Us</h4>
+              <p style={{ color: 'white', fontSize: '1.2rem', fontWeight: '600' }}>+91 (020) 2440-1234</p>
             </div>
-
-            <div className="farmer-card">
-              <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=800&auto=format&fit=crop" alt="David" />
-              <h4>David Chen</h4>
-              <p>Paid off $10k in debt using smart analytics.</p>
+            <div>
+              <h4 style={{ color: '#94a3b8', marginBottom: '0.5rem', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '2px' }}>Email</h4>
+              <p style={{ color: 'var(--primary-green)', fontSize: '1.2rem', fontWeight: '600' }}>support@vaultcore.ai</p>
             </div>
-
-            <div className="farmer-card">
-              <img src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?q=80&w=800&auto=format&fit=crop" alt="Elena" />
-              <h4>Elena Rodriguez</h4>
-              <p>Secured a 4% home renovation loan instantly.</p>
+            <div>
+              <h4 style={{ color: '#94a3b8', marginBottom: '0.5rem', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '2px' }}>Location</h4>
+              <p style={{ color: '#cbd5e1', fontSize: '1.2rem', fontWeight: '600' }}>FinTech Plaza, Pune, India</p>
             </div>
           </div>
         </section>
@@ -640,30 +612,30 @@ export default function Homepage() {
                 <Wallet size={24} color="var(--primary-green)" />
                 VaultCore.
               </div>
-              <p className="footer-desc">Architecting the future of personal finance. Unbiased loan suggestions and intelligent expense tracking.</p>
+              <p className="footer-desc">The next generation of AI-powered personal finance management. Intelligent, secure, and always on your side.</p>
             </div>
             <div className="footer-col">
-              <h4>Products</h4>
-              <a href="#" className="footer-link">Personal Loans</a>
-              <a href="#" className="footer-link">Auto Refinancing</a>
-              <a href="#" className="footer-link">Expense Tracker</a>
+              <h4>Platform</h4>
+              <a href="#" className="footer-link">AI Advisor</a>
+              <a href="#" className="footer-link">Loan Matching</a>
+              <a href="#" className="footer-link">Audit Engine</a>
             </div>
             <div className="footer-col">
-              <h4>Company</h4>
-              <a href="#" className="footer-link">About Us</a>
-              <a href="#" className="footer-link">Partner Network</a>
-              <a href="#" className="footer-link">Security Hub</a>
+              <h4>Resources</h4>
+              <a href="#" className="footer-link">Financial Blog</a>
+              <a href="#" className="footer-link">Security Whitepaper</a>
+              <a href="#" className="footer-link">API Docs</a>
             </div>
             <div className="footer-col">
-              <h4>Legal</h4>
-              <a href="#" className="footer-link">Terms of Service</a>
-              <a href="#" className="footer-link">Privacy Policy</a>
-              <a href="#" className="footer-link">Lending Disclosures</a>
+              <h4>Connect</h4>
+              <a href="#" className="footer-link">Twitter</a>
+              <a href="#" className="footer-link">LinkedIn</a>
+              <a href="#" className="footer-link">Support</a>
             </div>
           </div>
           <div className="footer-bottom">
             <span>© 2026 VaultCore Financial Technologies.</span>
-            <span>Support: 1-(800)-555-VAULT</span>
+            <span>Empowering financial freedom through AI.</span>
           </div>
         </footer>
 

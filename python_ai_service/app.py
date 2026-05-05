@@ -5,7 +5,6 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from pymongo import MongoClient
 from dotenv import load_dotenv
-import google.generativeai as genai
 import datetime
 from bson.objectid import ObjectId
 
@@ -16,13 +15,46 @@ CORS(app)
 
 MONGO_URI = os.getenv("MONGO_URI")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-if GEMINI_API_KEY:
-    genai.configure(api_key=GEMINI_API_KEY)
 
 # Fix for SSL connecting to MongoDB Atlas
 # If URI is missing, it will crash here, so ensure .env is correctly loaded
 client = MongoClient(MONGO_URI, tlsCAFile=certifi.where()) if MONGO_URI else None
 db = client.test if client else None
+
+def call_gemini_with_fallback(system_prompt, user_message=""):
+    if not GEMINI_API_KEY:
+        return None
+        
+    import urllib.request
+    import urllib.error
+    import json
+    
+    clean_key = GEMINI_API_KEY.strip()
+    prompt = f"{system_prompt}\n\nUser Question:\n{user_message}" if user_message else system_prompt
+    data = json.dumps({"contents": [{"parts": [{"text": prompt}]}]}).encode('utf-8')
+    
+    models = ["gemini-1.5-flash", "gemini-1.5-pro", "gemini-1.0-pro", "gemini-flash-latest"]
+    
+    for model in models:
+        try:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={clean_key}"
+            req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
+            with urllib.request.urlopen(req) as response:
+                result = json.loads(response.read().decode('utf-8'))
+                return result['candidates'][0]['content']['parts'][0]['text']
+        except urllib.error.HTTPError as e:
+            err_msg = e.read().decode()
+            print(f"Gemini API Error with model {model} ({e.code}): {err_msg}")
+            # Try the next model if the current one is overloaded, rate-limited, or not found/deprecated
+            if e.code in [503, 429, 404]:
+                continue
+            else:
+                break # For other errors like 400 Bad Request, abort and fallback to local
+        except Exception as e:
+            print(f"Gemini API General Error with model {model}: {e}")
+            continue
+            
+    return None # All models failed
 
 @app.route('/api/alerts', methods=['GET'])
 def get_alerts():
@@ -54,9 +86,14 @@ def get_alerts():
             "message": f"You are spending heavily on {top_category} (₹{top_amount}). Consider cutting back."
         })
         
-    budget_cursor = db.budgets.find({"userId": ObjectId(user_id)})
+    # Fetch Budget and Loans for context
+    budget_cursor = db.budgets.find({"userId": ObjectId(user_id)}).sort("createdAt", -1)
     budgets = list(budget_cursor)
     
+    loan_cursor = db.loans.find().limit(3)
+    available_loans = list(loan_cursor)
+    loan_str = ", ".join([f"{l.get('bank')} ({l.get('interestRate')}% APR)" for l in available_loans])
+
     if budgets:
         latest_budget = budgets[-1]
         income = float(latest_budget.get('income', 0))
@@ -69,6 +106,16 @@ def get_alerts():
                 "type": "danger",
                 "message": f"CRITICAL: You have spent {(total_spent/income)*100:.1f}% of your planned budget limit!"
             })
+            if available_loans:
+                alerts.append({
+                    "type": "info",
+                    "message": f"LOAN ADVISORY: Consider consolidating debt with {available_loans[0].get('bank')} at {available_loans[0].get('interestRate')}% interest."
+                })
+        elif income > 50000 and total_spent < (income * 0.4):
+            alerts.append({
+                "type": "success",
+                "message": f"ELITE STATUS: Your high savings ratio makes you eligible for {loan_str}."
+            })
     else:
         alerts.append({
             "type": "success",
@@ -76,6 +123,147 @@ def get_alerts():
         })
             
     return jsonify({"alerts": alerts})
+
+@app.route('/api/generate-report', methods=['POST'])
+def generate_report():
+    if db is None:
+        return jsonify({"error": "Database connection missing."}), 500
+        
+    data = request.json
+    user_id = data.get('userId')
+    start_date = data.get('startDate') # YYYY-MM-DD
+    end_date = data.get('endDate')     # YYYY-MM-DD
+    
+    if not user_id or not start_date or not end_date:
+        return jsonify({"error": "Missing required fields."}), 400
+
+    try:
+        # Convert strings to datetime objects for filtering
+        start_dt = datetime.datetime.strptime(start_date, "%Y-%m-%d")
+        end_dt = datetime.datetime.strptime(end_date, "%Y-%m-%d") + datetime.timedelta(days=1)
+        
+        tx_cursor = db.transactions.find({
+            "userId": ObjectId(user_id),
+            "date": {"$gte": start_dt, "$lt": end_dt}
+        })
+        transactions = []
+        seen_ids = set()
+        for t in tx_cursor:
+            t_id = str(t['_id'])
+            if t_id not in seen_ids:
+                seen_ids.add(t_id)
+                t['_id'] = t_id
+                t['userId'] = str(t['userId'])
+                if isinstance(t.get('date'), datetime.datetime):
+                    t['date'] = t['date'].isoformat()
+                transactions.append(t)
+        
+        if not transactions:
+            return jsonify({
+                "reportData": {
+                    "period": f"{start_date} to {end_date}",
+                    "totalIncome": 0,
+                    "totalExpense": 0,
+                    "savings": 0,
+                    "categoryBreakdown": {},
+                    "transactions": []
+                },
+                "suggestions": "No transactions found for this period. Start tracking to get insights!"
+            })
+
+        df = pd.DataFrame(transactions)
+        df['date'] = pd.to_datetime(df['date'])
+        df['month_key'] = df['date'].dt.strftime('%Y-%m')
+        
+        # Group by month
+        months = sorted(df['month_key'].unique())
+        monthly_reports = []
+        
+        overall_income = 0
+        overall_expense = 0
+        
+        for m in months:
+            m_df = df[df['month_key'] == m]
+            m_income = float(m_df[m_df['type'] == 'income']['amount'].sum())
+            m_expense = float(m_df[m_df['type'] == 'expense']['amount'].sum())
+            
+            # Fetch budget for this specific month
+            budget = db.budgets.find_one({"userId": ObjectId(user_id), "month": m})
+            planned_inc = float(budget.get('income', 0)) if budget else 0
+            
+            # Aggregate Budget items by category to prevent repetition
+            budget_cat_map = {}
+            if budget:
+                for b_item in budget.get('expenses', []):
+                    cat = b_item.get('category', 'Uncategorized')
+                    budget_cat_map[cat] = budget_cat_map.get(cat, 0) + float(b_item.get('amount', 0))
+
+            # Category analysis for this month
+            m_cats = m_df[m_df['type'] == 'expense'].groupby('category')['amount'].sum().to_dict()
+            budget_audit = []
+            
+            # Use the aggregated budget map for the audit
+            for cat, b_amt in budget_cat_map.items():
+                a_amt = float(m_cats.get(cat, 0))
+                budget_audit.append({
+                    "category": cat,
+                    "budgeted": b_amt,
+                    "spent": a_amt,
+                    "remaining": b_amt - a_amt
+                })
+
+            
+            monthly_reports.append({
+                "month": m,
+                "income": planned_inc if planned_inc > 0 else m_income,
+                "actualIncome": m_income,
+                "expense": m_expense,
+                "savings": (planned_inc if planned_inc > 0 else m_income) - m_expense,
+                "budgetAudit": budget_audit,
+                "topCategory": m_df[m_df['type'] == 'expense'].groupby('category')['amount'].sum().idxmax() if not m_df[m_df['type'] == 'expense'].empty else "N/A"
+            })
+            
+            overall_income += (planned_inc if planned_inc > 0 else m_income)
+            overall_expense += m_expense
+
+        # AI Suggestions Prompt for Chronological Analysis
+        system_prompt = f"""
+        You are a senior financial analyst. Analyze this chronological financial data from {start_date} to {end_date}:
+        {monthly_reports}
+        
+        Total Period Income: ₹{overall_income}
+        Total Period Expense: ₹{overall_expense}
+        
+        Provide a chronological analysis:
+        1. For each month, give a 1-sentence 'Alert' or 'Suggestion'.
+        2. At the end, give a 3-point strategy for the next quarter.
+        Be direct, professional, and highlight budget deviations.
+        """
+        
+        suggestions = "Focus on tracking more categories to unlock AI insights."
+        if GEMINI_API_KEY:
+            try:
+                res = call_gemini_with_fallback(system_prompt)
+                if res:
+                    suggestions = res
+            except Exception as e:
+                print(f"Gemini fallback chain failed in chronological report: {e}")
+        
+        return jsonify({
+            "reportData": {
+                "period": f"{start_date} to {end_date}",
+                "overallIncome": overall_income,
+                "overallExpense": overall_expense,
+                "overallSavings": overall_income - overall_expense,
+                "monthlyBreakdown": monthly_reports,
+                "transactions": transactions # Included for record
+            },
+            "suggestions": suggestions
+        })
+        
+    except Exception as e:
+        print(f"Error generating report: {e}")
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/chat', methods=['POST'])
 def chat():
@@ -104,6 +292,11 @@ def chat():
     if budgets:
         income = budgets[0].get('income', 0)
         budget_context = f"User has a monthly planned budget of ₹{income}."
+
+    # Fetch Real-time Loan Offers for context
+    loan_cursor = db.loans.find().limit(5)
+    loans = list(loan_cursor)
+    loan_context = "Available Loan Offers:\n" + "\n".join([f"- {l.get('bank')}: {l.get('interestRate')}% APR, type: {l.get('type')}, processing fee: ₹{l.get('processingFee')}" for l in loans])
 
     csv_context = ""
     if file and file.filename.endswith('.csv'):
@@ -158,39 +351,26 @@ def chat():
         
     system_prompt = f"""
     You are 'VaultCore AI', an expert financial assistant integrated into a high-end personal finance app.
-    The user is asking a proactive question about their finances (e.g., 'Should I buy this?').
+    The user is asking a proactive question about their finances (e.g., 'Should I buy this?' or 'Which loan is better?').
+    
     Context:
     {budget_context}
     Recent user database expenses: {tx_data}
+    {loan_context}
     {csv_context}
+    
     Constraint: Provide a concise (max 3-4 sentences), highly analytical, and friendly answer. 
-    Use the database expenses AND any Uploaded CSV Analysis (if present) to justify if they can afford an item or to provide suggestions on managing their money.
+    Use the database expenses AND the Available Loan Offers to justify if they can afford an item. 
+    If they are asking about loans, compare the provided interest rates and suggest the best one based on their context.
     """
     
     if GEMINI_API_KEY:
         try:
-            import urllib.request
-            import urllib.error
-            import json
-            
-            clean_key = GEMINI_API_KEY.strip()
-            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={clean_key}"
-            prompt = f"{system_prompt}\n\nUser Question:\n{user_message}"
-            data = json.dumps({
-                "contents": [{"parts": [{"text": prompt}]}]
-            }).encode('utf-8')
-            
-            req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
-            with urllib.request.urlopen(req) as response:
-                result = json.loads(response.read().decode('utf-8'))
-                
-            reply = result['candidates'][0]['content']['parts'][0]['text']
-            return jsonify({"reply": reply})
-        except urllib.error.HTTPError as e:
-            print(f"Gemini API Google Error {e.code}: {e.read().decode()}")
-            pass # Fallback to local heuristic
+            res = call_gemini_with_fallback(system_prompt, user_message)
+            if res:
+                return jsonify({"reply": res})
         except Exception as e:
-            print(f"Gemini API General Error: {e}")
+            print(f"Gemini fallback chain failed: {e}")
             pass # Fallback to local heuristic
     # ==========================================
     # OFFLINE PANDAS / PYTHON HEURISTIC ENGINE
@@ -228,4 +408,4 @@ def chat():
     return jsonify({"reply": reply})
 
 if __name__ == '__main__':
-    app.run(port=5000, debug=True)
+    app.run(port=5001, debug=True)

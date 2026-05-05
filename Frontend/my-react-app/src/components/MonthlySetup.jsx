@@ -51,19 +51,7 @@ function MonthlySetup() {
     }
   };
 
-  // --- AI 50/30/20 AUTO-DISTRIBUTION ---
-  const handleAutoDistribute = () => {
-    if (!income) {
-      setMessage("Please enter an Expected Income first.");
-      return;
-    }
-    const val = Number(income);
-    setExpenses([
-      { category: "Needs (Rent, Groceries...)", amount: (val * 0.5).toFixed(0) },
-      { category: "Wants (Dining, Hobbies...)", amount: (val * 0.3).toFixed(0) },
-      { category: "Savings & Investments", amount: (val * 0.2).toFixed(0) },
-    ]);
-  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -100,31 +88,41 @@ function MonthlySetup() {
   const unallocated = income ? Math.max(0, Number(income) - totalExpense) : 0;
   const isOverBudget = income ? totalExpense > Number(income) : false;
 
+  const baseTotal = income > 0 ? Number(income) : totalExpense;
+
   const COLORS = ['#38bdf8', '#f43f5e', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#14b8a6'];
 
   const chartData = [
-    ...expenses.filter(e => e.amount).map((exp, i) => ({
-      name: exp.category || `Category ${i+1}`,
-      value: Number(exp.amount),
-      color: COLORS[i % COLORS.length]
-    })),
-    // Render unallocated as a ghost slice if income exists
-    ...(unallocated > 0 ? [{ name: 'Unallocated', value: unallocated, color: 'rgba(255,255,255,0.05)' }] : [])
+    ...expenses.filter(e => e.amount).map((exp, i) => {
+      const val = Number(exp.amount);
+      const percentage = baseTotal > 0 ? ((val / baseTotal) * 100).toFixed(1) : 0;
+      return {
+        name: exp.category || `Category ${i + 1}`,
+        value: val,
+        percentage: percentage,
+        color: COLORS[i % COLORS.length]
+      };
+    }),
+    ...(unallocated > 0 ? [{
+      name: 'Unallocated',
+      value: unallocated,
+      percentage: baseTotal > 0 ? ((unallocated / baseTotal) * 100).toFixed(1) : 0,
+      color: 'rgba(255,255,255,0.05)'
+    }] : [])
   ];
 
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 100 }}>
       {/* HEADER SECTION */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '20px' }}>
-        <h2 style={{ margin: 0, color: "white", fontFamily: "'Playfair Display', serif", fontSize: "2rem" }}>Smart Budget AI</h2>
-        <button onClick={handleAutoDistribute} className="glass-button secondary ai-glow-btn">✨ AI 50/30/20 Plan</button>
+        <h2 style={{ margin: 0, color: "white", fontFamily: "'Playfair Display', serif", fontSize: "2rem" }}>Smart Budget</h2>
       </div>
 
       <div className="budget-grid">
-        
+
         {/* LEFT COLUMN: FORM */}
         <div className="glass-card budget-form" style={{ padding: "2rem" }}>
-          
+
           {message && (
             <div className={`alert-msg ${message.includes('✅') ? 'success' : 'warning'}`}>
               {message}
@@ -132,7 +130,7 @@ function MonthlySetup() {
           )}
 
           <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.5rem" }}>
-            
+
             <div className="form-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1.5rem" }}>
               <div className="input-group">
                 <label>Target Month</label>
@@ -146,7 +144,7 @@ function MonthlySetup() {
 
             <div className="expenses-section" style={{ marginTop: "1rem", paddingTop: "1.5rem", borderTop: "1px dashed rgba(255,255,255,0.1)" }}>
               <h3 style={{ margin: "0 0 1rem 0", color: "#f8fafc", fontSize: "1.1rem" }}>Predictive Expense Allocation</h3>
-              
+
               {expenses.map((exp, index) => (
                 <motion.div key={index} className="expense-row" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} style={{ display: "grid", gridTemplateColumns: expenses.length > 1 ? "12px 2fr 2fr auto" : "12px 2fr 2fr", gap: "1rem", marginBottom: "1rem", alignItems: "center" }}>
                   <div className="cat-color-badge" style={{ width: '12px', height: '12px', borderRadius: '50%', background: COLORS[index % COLORS.length] }}></div>
@@ -172,7 +170,7 @@ function MonthlySetup() {
         {/* RIGHT COLUMN: INTERACTIVE VISUALIZER */}
         <div className="glass-card budget-visualizer" style={{ padding: "2rem", display: "flex", flexDirection: "column", alignItems: "center" }}>
           <h3 style={{ margin: "0 0 0.5rem 0", color: "#cbd5e1" }}>Income Utilization</h3>
-          
+
           <div className="capacity-stat">
             <span style={{ fontSize: '2rem', fontFamily: "'Playfair Display', serif", color: isOverBudget ? '#f43f5e' : '#10b981' }}>{income ? Math.min((totalExpense / Number(income)) * 100, 100).toFixed(1) : 0}%</span>
             <span style={{ color: '#94a3b8', fontSize: '0.8rem', textTransform: 'uppercase' }}>Allocated</span>
@@ -181,12 +179,12 @@ function MonthlySetup() {
           <div style={{ width: '100%', height: '300px', margin: '1rem 0', position: 'relative' }}>
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
-                <Pie 
-                  data={chartData} 
-                  cx="50%" cy="50%" 
-                  innerRadius={70} 
-                  outerRadius={100} 
-                  paddingAngle={5} 
+                <Pie
+                  data={chartData}
+                  cx="50%" cy="50%"
+                  innerRadius={70}
+                  outerRadius={100}
+                  paddingAngle={5}
                   dataKey="value"
                   stroke="none"
                 >
@@ -194,9 +192,9 @@ function MonthlySetup() {
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip 
-                  contentStyle={{background: 'rgba(15, 23, 42, 0.9)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff'}}
-                  formatter={(val) => `₹${val}`}
+                <Tooltip
+                  contentStyle={{ background: 'rgba(15, 23, 42, 0.9)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }}
+                  formatter={(val, name, props) => [`₹${val} (${props.payload.percentage}%)`, name]}
                 />
               </PieChart>
             </ResponsiveContainer>
@@ -212,7 +210,7 @@ function MonthlySetup() {
             {chartData.map((d, i) => (
               <div key={i} className="legend-item">
                 <span className="dot" style={{ background: d.color }}></span>
-                <span className="label">{d.name}</span>
+                <span className="label">{d.name} <span style={{ color: '#94a3b8', fontSize: '0.75rem', marginLeft: '4px' }}>({d.percentage}%)</span></span>
                 <span className="bold">₹{d.value}</span>
               </div>
             ))}

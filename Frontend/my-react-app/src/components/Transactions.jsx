@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { Coffee, Car, Home, ShoppingBag, Zap, CreditCard } from "lucide-react";
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from "recharts";
 
 function Transactions() {
   const [groupedTransactions, setGroupedTransactions] = useState({});
@@ -119,6 +120,24 @@ function Transactions() {
   const remainingBudget = budgetLimit ? budgetLimit - spentThisMonth : null;
   const safeDailyAllowance = remainingBudget ? Math.max(0, (remainingBudget / getDaysLeftInMonth()).toFixed(0)) : "Not Set";
 
+  // Radar Chart Data Calculation
+  const radarData = React.useMemo(() => {
+    const cats = { Food: 0, Transport: 0, Shopping: 0, Bills: 0, Entertainment: 0, Other: 0 };
+    Object.values(groupedTransactions).flat().forEach(t => {
+      if (t.type === 'expense') {
+        let match = false;
+        for (let key in cats) {
+          if (t.category.toLowerCase().includes(key.toLowerCase())) {
+            cats[key] += t.amount;
+            match = true;
+          }
+        }
+        if (!match) cats.Other += t.amount;
+      }
+    });
+    return Object.keys(cats).map(key => ({ subject: key, A: cats[key], fullMark: 5000 }));
+  }, [groupedTransactions]);
+
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 100 }}>
       {/* HEADER SECTION WITH GAMIFIED ALLOWANCE */}
@@ -178,6 +197,21 @@ function Transactions() {
 
               <button type="submit" className="glass-button" style={{ marginTop: "10px" }}>Log Transaction</button>
             </form>
+          </div>
+
+          {/* SPENDING DNA MAP (UNIQUE FEATURE) */}
+          <div className="glass-card" style={{ padding: "1.5rem", marginTop: "1.5rem" }}>
+            <h3 style={{ marginTop: 0, marginBottom: "0.5rem", fontSize: "1.1rem", color: "#f8fafc" }}>Spending DNA Map</h3>
+            <p style={{ margin: "0 0 1rem 0", color: "#94a3b8", fontSize: "0.85rem" }}>AI geometric representation of your lifestyle footprint.</p>
+            <div style={{ width: "100%", height: "250px" }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarData}>
+                  <PolarGrid stroke="rgba(255,255,255,0.1)" />
+                  <PolarAngleAxis dataKey="subject" tick={{ fill: '#a5b4fc', fontSize: 10 }} />
+                  <Radar name="Spending" dataKey="A" stroke="#38bdf8" fill="#38bdf8" fillOpacity={0.5} />
+                </RadarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
 
